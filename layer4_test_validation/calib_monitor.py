@@ -1,13 +1,13 @@
-import json
+﻿import json
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 from config.settings import get_settings
 from tracking.mlflow_logger import log_metric  # no-op
 
-Number = Union[int, float]
+Number = int | float
 
 
 class CalibMonitor:
@@ -55,14 +55,14 @@ class CalibMonitor:
                 pass
         return n
 
-    def flush(self, out_dir: Optional[Union[str, Path]] = None) -> str:
+    def flush(self, out_dir: str | Path | None = None) -> str:
         """Günün dosyasına bir satır yazar ve dosya yolunu döndürür."""
         brier, logloss = self._averages()
         rec = {"brier": brier, "logloss": logloss, "n": self._n}
 
         d = Path(out_dir) if out_dir is not None else self._metrics_dir()
         d.mkdir(parents=True, exist_ok=True)
-        fname = datetime.now(timezone.utc).strftime("%Y-%m-%d") + ".jsonl"
+        fname = datetime.now(UTC).strftime("%Y-%m-%d") + ".jsonl"
         out_path = d / fname
 
         with out_path.open("a", encoding="utf-8") as f:
@@ -79,10 +79,10 @@ class CalibMonitor:
         return str(out_path)
 
     # TEST'in beklediği isim:
-    def flush_daily(self, out_dir: Optional[Union[str, Path]] = None) -> str:
+    def flush_daily(self, out_dir: str | Path | None = None) -> str:
         return self.flush(out_dir=out_dir)
 
-    def snapshot(self) -> Dict[str, Any]:
+    def snapshot(self) -> dict[str, Any]:
         brier, logloss = self._averages()
         n_disk = self.count_predictions()
         n = max(self._n, n_disk)

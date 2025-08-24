@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Dict
+from typing import Any
 
 _EMAIL_RE = re.compile(r"([A-Za-z0-9._%+-]+)@([A-Za-z0-9.-]+\.[A-Za-z]{2,})")
 _PHONE_RE = re.compile(r"\b(\+?\d[\d\-\s]{7,}\d)\b")
@@ -34,9 +34,7 @@ def mask_email(s: str) -> str:
 
 
 def mask_phone(s: str) -> str:
-    return _PHONE_RE.sub(
-        lambda m: m.group(1)[:2] + "*" * (len(m.group(1)) - 4) + m.group(1)[-2:], s
-    )
+    return _PHONE_RE.sub(lambda m: m.group(1)[:2] + "*" * (len(m.group(1)) - 4) + m.group(1)[-2:], s)
 
 
 def mask_value(k: str, v: Any):
@@ -48,9 +46,7 @@ def mask_value(k: str, v: Any):
     return out
 
 
-def pii_mask(
-    record: Dict[str, Any], whitelist_keys: set[str] | None = None
-) -> Dict[str, Any]:
+def pii_mask(record: dict[str, Any], whitelist_keys: set[str] | None = None) -> dict[str, Any]:
     wl = whitelist_keys or set()
     out = {}
     for k, v in record.items():
@@ -67,15 +63,13 @@ def pii_mask(
     return out
 
 
-def reliability_tagging(source: str, meta: Dict[str, Any]) -> float:
+def reliability_tagging(source: str, meta: dict[str, Any]) -> float:
     """
     Çok basit sezgisel puanlayıcı:
     - Kaynak türüne göre taban puan
     - citation_count ve verified_source ile artı/eksi
     """
-    base = {"finance": 0.75, "astro": 0.55, "history": 0.7, "social": 0.5}.get(
-        source, 0.5
-    )
+    base = {"finance": 0.75, "astro": 0.55, "history": 0.7, "social": 0.5}.get(source, 0.5)
     cit = float(meta.get("citation_count", 0.0))
     ver = 1.0 if meta.get("verified_source") else 0.0
     score = base + min(0.15, cit * 0.01) + ver * 0.1

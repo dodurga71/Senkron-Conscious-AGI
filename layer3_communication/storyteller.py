@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 def _confidence_label(score: float) -> str:
@@ -11,7 +11,7 @@ def _confidence_label(score: float) -> str:
     return "düşük"
 
 
-def _format_drivers(source_details: List[Dict[str, float]], top_k: int = 3) -> str:
+def _format_drivers(source_details: list[dict[str, float]], top_k: int = 3) -> str:
     if not source_details:
         return ""
     tops = source_details[:top_k]
@@ -28,9 +28,9 @@ def build_narrative(
     signal: float,
     uncertainty: float,
     reliability: float,
-    sources: Optional[List[str]] | None = None,
-    source_details: Optional[List[Dict[str, float]]] = None,
-) -> Dict[str, Any]:
+    sources: list[str] | None | None = None,
+    source_details: list[dict[str, float]] | None = None,
+) -> dict[str, Any]:
     """Bilge Rehber tarzı metin + şeffaflık alanları."""
     sources = sources or [
         "astro",
@@ -46,9 +46,7 @@ def build_narrative(
 
     yön = "yukarı" if signal > 0 else ("aşağı" if signal < 0 else "nötr")
     kuvvet = abs(signal)
-    kuvvet_etiket = (
-        "zayıf" if kuvvet < 0.08 else ("ılımlı" if kuvvet < 0.2 else "belirgin")
-    )
+    kuvvet_etiket = "zayıf" if kuvvet < 0.08 else ("ılımlı" if kuvvet < 0.2 else "belirgin")
 
     drivers_txt = _format_drivers(source_details or [])
     driver_clause = f" Başlıca sürücüler: {drivers_txt}." if drivers_txt else ""
@@ -59,14 +57,11 @@ def build_narrative(
         f"Güven düzeyi {conf_label}; çünkü model güvenilirliği {reliability:.2f} ve "
         f"belirsizlik {uncertainty:.2f}. "
         "Bu bir kehanet değil; olasılık ufkunda bir rota önerisi. "
-        "Adımlarını küçük riskle dene, çeşitlendir ve geri bildirim döngülerini kısa tut."
-        + driver_clause
+        "Adımlarını küçük riskle dene, çeşitlendir ve geri bildirim döngülerini kısa tut." + driver_clause
     )
 
     assumptions = [
-        "Paralel modüllerin ( "
-        + ", ".join(sources)
-        + " ) ağırlıklı çıktıları kullanıldı.",
+        "Paralel modüllerin ( " + ", ".join(sources) + " ) ağırlıklı çıktıları kullanıldı.",
         "Kalibrasyon yer tutucu düzeydedir; üretimde Platt/Isotonic uygulanacaktır.",
         "Veri temel doğrulamadan geçti (tip/sınır kontrolleri).",
     ]

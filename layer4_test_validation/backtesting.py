@@ -1,5 +1,4 @@
 import math
-from typing import Dict
 
 
 def _sharpe(returns, eps=1e-12):
@@ -30,17 +29,13 @@ def backtest_with_pandas(prices, signal_series, fee_bps=5):
     return {"sharpe": _sharpe(returns), "cumret": float(sum(returns))}
 
 
-def run_backtest(
-    prices, signal_series, use_backtrader: bool = False
-) -> Dict[str, float]:
+def run_backtest(prices, signal_series, use_backtrader: bool = False) -> dict[str, float]:
     # CodeCarbon opsiyonel
     tracker = None
     try:
         from codecarbon import EmissionsTracker
 
-        tracker = EmissionsTracker(
-            log_level="error", measure_power_secs=1, offline=True
-        )
+        tracker = EmissionsTracker(log_level="error", measure_power_secs=1, offline=True)
         tracker.start()
     except Exception:
         tracker = None

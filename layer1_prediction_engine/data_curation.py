@@ -6,16 +6,16 @@ Katman 1 - Veri Küratörlüğü ve Füzyon Arayüzü
 Not: Minimal iskelet; ileride Dask/PyTorch eklenecek.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 
-def curate_data(raw_events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def curate_data(raw_events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     Veri temizleme ve etik filtreleme (basit iskelet).
     - None alanları eler
     - Temel alanların varlığını doğrular (id, ts)
     """
-    curated: List[Dict[str, Any]] = []
+    curated: list[dict[str, Any]] = []
     required = {"id", "ts"}
     for e in raw_events or []:
         if e is None:
@@ -27,10 +27,10 @@ def curate_data(raw_events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
 
 def fuse_data(
-    curated: List[Dict[str, Any]],
-    astro: Dict[str, Any] | None = None,
-    finance: Dict[str, Any] | None = None,
-) -> Dict[str, Any]:
+    curated: list[dict[str, Any]],
+    astro: dict[str, Any] | None = None,
+    finance: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """
     Çoklu kaynak füzyonu (minimal iskelet).
     Girdi: curated olay listesi + opsiyonel astro/finans sözlükleri

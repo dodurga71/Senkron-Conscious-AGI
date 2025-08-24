@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from .base import BasePredictor
 
@@ -6,7 +6,7 @@ from .base import BasePredictor
 class ChaosPredictor(BasePredictor):
     name = "chaos_predictor"
 
-    def predict(self, features: Dict[str, Any]) -> Dict[str, float]:
+    def predict(self, features: dict[str, Any]) -> dict[str, float]:
         lyapunov = float(features.get("lyapunov", 0.0))
         score = 0.05 if lyapunov < 0.5 else -0.05
         return {

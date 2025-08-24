@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 """
 MLflow skinny varsa kullan, yoksa no-op olacak hafif bir sarmalayıcı.
@@ -24,7 +24,7 @@ class _NoopRun:
         return False
 
 
-def start_run(run_name: Optional[str] = None):
+def start_run(run_name: str | None = None):
     if MLFLOW_ENABLED:
         return mlflow.start_run(run_name=run_name)  # type: ignore[attr-defined]
     return _NoopRun()
@@ -38,7 +38,7 @@ def end_run(status: str = "FINISHED"):
             pass  # sessizce yut
 
 
-def log_metric(key: str, value: float, step: Optional[int] = None):
+def log_metric(key: str, value: float, step: int | None = None):
     """CI'nin beklediği imza: tek metrik loglama."""
     if MLFLOW_ENABLED:
         try:

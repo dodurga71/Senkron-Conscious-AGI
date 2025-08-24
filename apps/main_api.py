@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
@@ -19,13 +19,13 @@ app = FastAPI(title="SENKRON API", version="0.2.0")
 
 
 class FeaturesIn(BaseModel):
-    features: Dict[str, Any] = Field(default_factory=dict)
+    features: dict[str, Any] = Field(default_factory=dict)
 
 
 class InterpretationOut(BaseModel):
-    nlg: Dict[str, Any]
-    raw: Dict[str, Any]
-    meta: Dict[str, Any]
+    nlg: dict[str, Any]
+    raw: dict[str, Any]
+    meta: dict[str, Any]
 
 
 def _bump_metrics():
@@ -33,9 +33,9 @@ def _bump_metrics():
     s = get_settings()
     metrics_dir = Path(s.METRICS_DIR)
     metrics_dir.mkdir(parents=True, exist_ok=True)
-    dayfile = metrics_dir / (datetime.now(timezone.utc).strftime("%Y-%m-%d") + ".jsonl")
+    dayfile = metrics_dir / (datetime.now(UTC).strftime("%Y-%m-%d") + ".jsonl")
     rec = {
-        "ts": datetime.now(timezone.utc).isoformat(),
+        "ts": datetime.now(UTC).isoformat(),
         "event": "predict",  # içerik önemli değil; CalibMonitor satır sayıyor
     }
     with dayfile.open("a", encoding="utf-8") as f:
@@ -56,9 +56,7 @@ def interpret_forecast(inp: FeaturesIn):
     source_names = [m.name for m in getattr(ens, "mods", [])]  # raw.sources için
 
     # 2) EFT: CE ve F_info
-    signals = {
-        "ensemble": {"signal": fused["signal"], "uncertainty": fused["uncertainty"]}
-    }
+    signals = {"ensemble": {"signal": fused["signal"], "uncertainty": fused["uncertainty"]}}
     ce = CEState.from_signals(signals)
     score = f_info(signals, ce.C, alpha=0.1)
 

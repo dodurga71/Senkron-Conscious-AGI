@@ -8,7 +8,7 @@ Katman 4 - Metrik & Enerji Ölçüm Planı
 
 import os
 import time
-from typing import Sequence
+from collections.abc import Sequence
 
 
 def compute_accuracy(pred: Sequence, true: Sequence) -> float:
@@ -39,8 +39,7 @@ def measure_energy_usage():
             "wall_seconds": wall,
             "energy_proxy_seconds": wall,  # geri uyumlu alan
             "cpu_user_delta": getattr(cpu1, "user", 0.0) - getattr(cpu0, "user", 0.0),
-            "cpu_system_delta": getattr(cpu1, "system", 0.0)
-            - getattr(cpu0, "system", 0.0),
+            "cpu_system_delta": getattr(cpu1, "system", 0.0) - getattr(cpu0, "system", 0.0),
             "rss_mb": rss_mb,
         }
     except Exception:

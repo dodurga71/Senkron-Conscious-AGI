@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from .astro_predictor import AstroPredictor
 from .chaos_predictor import ChaosPredictor
@@ -17,11 +17,11 @@ class EnsemblePredictor:
             GeopoliticalPredictor(),
         ]
 
-    def predict(self, features: Dict[str, Any]) -> Dict[str, Any]:
-        sigs: List[float] = []
-        weights: List[float] = []
-        unc: List[float] = []
-        details: List[Dict[str, float]] = []
+    def predict(self, features: dict[str, Any]) -> dict[str, Any]:
+        sigs: list[float] = []
+        weights: list[float] = []
+        unc: list[float] = []
+        details: list[dict[str, float]] = []
 
         for m in self.mods:
             r = m.predict(features)

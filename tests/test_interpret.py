@@ -20,7 +20,4 @@ def test_interpret_endpoint_ok():
     js = r.json()
     assert "nlg" in js and "raw" in js and "meta" in js
     assert "narrative" in js["nlg"] and "confidence" in js["nlg"]
-    assert all(
-        k in js["raw"]
-        for k in ["signal", "uncertainty", "reliability", "f_info", "ce_dim"]
-    )
+    assert all(k in js["raw"] for k in ["signal", "uncertainty", "reliability", "f_info", "ce_dim"])

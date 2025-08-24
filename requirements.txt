@@ -11,3 +11,4 @@ mlflow-skinny>=2.14.1
 pydantic-settings>=2.2
 scipy
 psutil
+dask

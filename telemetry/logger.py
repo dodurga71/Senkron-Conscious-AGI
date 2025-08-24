@@ -1,19 +1,19 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import pathlib
 import time
 import uuid
 from contextlib import contextmanager
-from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 
 @contextmanager
 def telemetry_run(
     component: str,
     out_dir: str = "logs/telemetry",
-    extra: Optional[Dict[str, Any]] = None,
+    extra: dict[str, Any] | None = None,
 ):
     """
     Komponent bazlı ölçüm. JSONL'e şu alanlar yazılır:
@@ -28,9 +28,7 @@ def telemetry_run(
     try:
         from codecarbon import EmissionsTracker  # opsiyonel
 
-        tracker = EmissionsTracker(
-            log_level="error", measure_power_secs=1, offline=True
-        )
+        tracker = EmissionsTracker(log_level="error", measure_power_secs=1, offline=True)
         tracker.start()
     except Exception:
         tracker = None
@@ -46,13 +44,11 @@ def telemetry_run(
 
         duration = time.time() - start
         payload = {
-            "ts": datetime.now(timezone.utc).isoformat(),
+            "ts": datetime.now(UTC).isoformat(),
             "run_id": run_id,
             "component": component,
             "duration_sec": round(duration, 6),
-            "emissions_kg": (
-                float(emissions) if isinstance(emissions, (int, float)) else None
-            ),
+            "emissions_kg": (float(emissions) if isinstance(emissions, int | float) else None),
             "extra": extra or {},
         }
         path = pathlib.Path(out_dir)

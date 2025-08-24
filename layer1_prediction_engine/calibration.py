@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Iterable
+from collections.abc import Iterable
 
 
 def brier_score(y_true: Iterable[int], p_hat: Iterable[float]) -> float:
@@ -11,16 +11,11 @@ def brier_score(y_true: Iterable[int], p_hat: Iterable[float]) -> float:
     return sum((yi - pi) ** 2 for yi, pi in zip(y, p, strict=False)) / len(y)
 
 
-def log_loss(
-    y_true: Iterable[int], p_hat: Iterable[float], eps: float = 1e-12
-) -> float:
+def log_loss(y_true: Iterable[int], p_hat: Iterable[float], eps: float = 1e-12) -> float:
     y = list(y_true)
     p = [min(max(pi, eps), 1 - eps) for pi in p_hat]
     assert len(y) == len(p) and len(y) > 0
-    return -sum(
-        yi * math.log(pi) + (1 - yi) * math.log(1 - pi)
-        for yi, pi in zip(y, p, strict=False)
-    ) / len(y)
+    return -sum(yi * math.log(pi) + (1 - yi) * math.log(1 - pi) for yi, pi in zip(y, p, strict=False)) / len(y)
 
 
 class OnlineCalibration:

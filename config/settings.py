@@ -15,9 +15,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # pydantic-settings v2 yöntemi
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", case_sensitive=False
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False)
 
 
 @lru_cache

@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from .base import BasePredictor
 
@@ -6,7 +6,7 @@ from .base import BasePredictor
 class AstroPredictor(BasePredictor):
     name = "astro_predictor"
 
-    def predict(self, features: Dict[str, Any]) -> Dict[str, float]:
+    def predict(self, features: dict[str, Any]) -> dict[str, float]:
         score = 0.1 if features.get("moon_phase") == "waxing" else -0.05
         return {
             "signal": self.clamp(score, -1, 1),

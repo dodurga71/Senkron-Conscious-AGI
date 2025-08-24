@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import APIRouter
 
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/onur", tags=["onur"])
 _FORECASTS_RAW: deque = deque(maxlen=1000)
 
 
-def record_forecast_observation(raw: Dict[str, Any]) -> None:
+def record_forecast_observation(raw: dict[str, Any]) -> None:
     try:
         _FORECASTS_RAW.append(raw)
     except Exception:
@@ -45,12 +45,10 @@ def get_forecasts_raw(limit: int = 20):
     Son ham tahminler (interpret -> raw).
     Test beklentisi: top-level 'signals' (liste) ve 'f_info' (son değer) alanları bulunsun.
     """
-    items: List[Dict[str, Any]] = list(_FORECASTS_RAW)[-limit:]
-    last: Optional[Dict[str, Any]] = items[-1] if items else None
-    signals: List[float] = [float(x.get("signal", 0.0)) for x in items]
-    f_info_last: Optional[float] = (
-        float(last.get("f_info")) if (last and "f_info" in last) else None
-    )
+    items: list[dict[str, Any]] = list(_FORECASTS_RAW)[-limit:]
+    last: dict[str, Any] | None = items[-1] if items else None
+    signals: list[float] = [float(x.get("signal", 0.0)) for x in items]
+    f_info_last: float | None = float(last.get("f_info")) if (last and "f_info" in last) else None
     return {
         "count": len(_FORECASTS_RAW),
         "signals": signals,  # <-- testin aradığı alan

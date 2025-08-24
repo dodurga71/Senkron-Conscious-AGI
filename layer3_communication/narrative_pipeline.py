@@ -4,10 +4,10 @@ Katman 3 - Narrative Pipeline (İskelet)
 - Şimdilik: güvenli/denetlenebilir basit şablon üretimi.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 
-def generate_narrative(context: Dict[str, Any]) -> str:
+def generate_narrative(context: dict[str, Any]) -> str:
     """
     Minimal anlatı üretimi (placeholder).
     """

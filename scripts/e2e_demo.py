@@ -23,11 +23,7 @@ def main() -> None:
 
     # Curated çıktıyı oku (JSONL)
     curated_path = Path(out["outfile"])
-    curated = [
-        json.loads(line)
-        for line in curated_path.read_text(encoding="utf-8").splitlines()
-        if line.strip()
-    ]
+    curated = [json.loads(line) for line in curated_path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
     # Basit özellik: ortalama değer -> momentum
     avg_val = sum(r["value"] for r in curated) / len(curated) if curated else 0.0
@@ -46,9 +42,7 @@ def main() -> None:
     # Rapor yaz
     report_path = Path("outputs/demo_report.json")
     report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(
-        json.dumps(js, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    report_path.write_text(json.dumps(js, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"Demo OK -> {report_path}")
 
 

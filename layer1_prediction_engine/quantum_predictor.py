@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from .base import BasePredictor
 
@@ -6,7 +6,7 @@ from .base import BasePredictor
 class QuantumPredictor(BasePredictor):
     name = "quantum_predictor"
 
-    def predict(self, features: Dict[str, Any]) -> Dict[str, float]:
+    def predict(self, features: dict[str, Any]) -> dict[str, float]:
         corr = float(features.get("quantum_corr", 0.0))
         score = 0.15 if corr > 0 else -0.02
         return {

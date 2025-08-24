@@ -5,7 +5,8 @@ Katman 2 - SENKRON-EFT API (Güncel)
 Not: State içinde "cov" (liste/list of lists) yoksa güvenli fallback kullanılır.
 """
 
-from typing import Any, Dict, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 
 def _fro_norm(matrix: Iterable[Iterable[float]]) -> float:
@@ -27,7 +28,7 @@ def _fro_norm(matrix: Iterable[Iterable[float]]) -> float:
         return 0.0
 
 
-def compute_CE(state: Dict[str, Any]) -> float:
+def compute_CE(state: dict[str, Any]) -> float:
     """
     C_E durumu hesapla:
     - Eğer state["cov"] varsa Frobenius normu

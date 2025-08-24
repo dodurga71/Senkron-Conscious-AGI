@@ -1,8 +1,8 @@
 ﻿"""
-Basit e2e demo (güncel):
+e2e demo (güncel):
 - Ham örnek veriyi oku
 - Küratörlük + füzyon
-- EFT C_E ve F_info
+- EFT C_E (kovaryans varsa Frobenius norm) ve F_info
 - Narrative üret
 - Metrik/enerji ölç ve JSON çıktı olarak kaydet
 """
@@ -23,8 +23,9 @@ def main():
     curated = curate_data(raw)
     fused = fuse_data(curated, astro={"ok": True}, finance={"ok": True})
 
-    # C_E: örnek kovaryans yoksa fallback kullanır
-    ce = compute_CE({"example": 1, "fused_count": fused["count"]})
+    # Kovaryans örneği (2x2 birim matris -> Frobenius norm = sqrt(2))
+    cov = [[1.0, 0.0], [0.0, 1.0]]
+    ce = compute_CE({"cov": cov, "fused_count": fused["count"]})
     finfo = minimize_Finfo(expect_KR=ce, alpha=0.1, S_EE=1.0)
 
     narrative = generate_narrative({"topic": "demo", "score": finfo["F_info"]})
@@ -43,9 +44,7 @@ def main():
 
     Path("outputs").mkdir(parents=True, exist_ok=True)
     Path("logs").mkdir(parents=True, exist_ok=True)
-    Path("outputs/e2e_baseline.json").write_text(
-        json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
+    Path("outputs/e2e_baseline.json").write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
     print("[e2e-baseline] outputs/e2e_baseline.json yazıldı.")
 
 
