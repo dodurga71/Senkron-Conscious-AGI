@@ -8,3 +8,4 @@ pandas>=2.0
 backtrader>=1.9.78.123
 codecarbon>=2.3.5
 mlflow-skinny>=2.14.1
+pydantic-settings>=2.2
