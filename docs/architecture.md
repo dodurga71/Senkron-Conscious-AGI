@@ -45,3 +45,46 @@
 [Uygulamalar & Onur Modülü]
   ├─ apps/: Kişisel Finans Asistanı, Kişisel Astro Asistanı, Kurumsal Strateji
   └─ onur-module/: iç durumlara tam erişimli geliştirici arayüz (read‑only/log‑guard)
+## Mermaid Diyagramı
+
+```mermaid
+flowchart TB
+  subgraph Sources[Veri Kaynakları]
+    A1[Astro]
+    A2[Tarihsel]
+    A3[Finans/Ekonomi]
+    A4[Sosyal/Duygu]
+  end
+
+  subgraph L1[Katman 1: Tahmin Motoru + Veri Küratörlüğü]
+    L1A[Çoklu Veri Füzyonu]
+    L1B[Paralel Modüller]
+    L1C[Kalibrasyon]
+    L1D[Etik Kürasyon]
+  end
+
+  subgraph L2[Katman 2: SENKRON-EFT Çekirdeği]
+    L2A[C_E Durum Temsili]
+    L2B[F_info Minimizasyonu]
+    L2C[EAP Stabilite & Güvenlik]
+  end
+
+  subgraph L3[Katman 3: İletişim (NLG)]
+    L3A[Bilge Rehber Anlatı]
+  end
+
+  subgraph L4[Katman 4: Test & Validasyon]
+    L4A[Backtesting/Simülasyon]
+    L4B[Metrikler & Enerji]
+  end
+
+  A1-->L1A
+  A2-->L1A
+  A3-->L1A
+  A4-->L1A
+  L1A-->L1B-->L1C-->L1D-->L2A-->L2B-->L3A
+  L2C-->L1B
+  L4A-->L1B
+  L4B-->L2B
+  L3A-->|çıktılar|EndUser[(Uygulamalar)]
+
