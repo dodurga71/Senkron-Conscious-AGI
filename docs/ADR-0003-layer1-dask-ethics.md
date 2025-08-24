@@ -1,4 +1,4 @@
-﻿# ADR-0003: Katman-1 Dask + Etik Kürasyon
+# ADR-0003: Katman-1 Dask + Etik Kürasyon
 ## Karar
 - JSON akışları Dask Bag ile parçalı işlenecek.
 - Minimum sahalar: {id, ts}; eksikler elenir.

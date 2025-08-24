@@ -1,4 +1,4 @@
-﻿"""
+"""
 Katman 2 - SENKRON-EFT API (Güncel)
 - C_E durumu: varsa kovaryans benzeri matrisin Frobenius normu
 - F_info = <K_R> - α * S_EE
@@ -49,3 +49,19 @@ def minimize_Finfo(expect_KR: float, alpha: float, S_EE: float) -> dict:
     """
     f_info = float(expect_KR) - float(alpha) * float(S_EE)
     return {"F_info": f_info}
+
+
+def grid_minimize_finfo(expect_KR: float, S_EE: float, alphas) -> dict:
+    """
+    α ızgarasında F_info(α) = <K_R> - α·S_EE için argmin seç.
+    Dönüş: {"alpha": α*, "F_info": f*}
+    """
+    alphas = list(alphas or [])
+    if not alphas:
+        return {"alpha": 0.0, "F_info": float(expect_KR)}
+    best = None
+    for a in alphas:
+        f = float(expect_KR) - float(a) * float(S_EE)
+        if best is None or f < best[1]:
+            best = (float(a), f)
+    return {"alpha": best[0], "F_info": best[1]}

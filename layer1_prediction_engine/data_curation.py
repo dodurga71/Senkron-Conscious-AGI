@@ -42,3 +42,32 @@ def fuse_data(
         "has_astro": bool(astro),
         "has_finance": bool(finance),
     }
+
+
+def normalize_numeric_fields(rows, fields):
+    """
+    Basit min-max normalizasyonu [0,1].
+    rows: List[Dict]; fields: List[str]
+    Dönüş: (normalized_rows, stats) -> stats[field] = {"min": m, "max": M}
+    Not: None/eksik değerler korunur.
+    """
+    if not rows:
+        return rows, {f: {"min": None, "max": None} for f in fields}
+    mins, maxs = {}, {}
+    for f in fields:
+        vals = [float(r.get(f)) for r in rows if r is not None and isinstance(r.get(f), int | float)]
+        mins[f] = min(vals) if vals else None
+        maxs[f] = max(vals) if vals else None
+
+    out = []
+    for r in rows:
+        if r is None:
+            continue
+        rr = dict(r)
+        for f in fields:
+            v = rr.get(f)
+            if isinstance(v, int | float) and mins[f] is not None and maxs[f] is not None and maxs[f] != mins[f]:
+                rr[f] = (float(v) - mins[f]) / (maxs[f] - mins[f])
+        out.append(rr)
+    stats = {f: {"min": mins[f], "max": maxs[f]} for f in fields}
+    return out, stats

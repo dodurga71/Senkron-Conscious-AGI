@@ -1,4 +1,4 @@
-﻿# ADR-0004: EFT Biçimselleştirme (C_E, F_info)
+# ADR-0004: EFT Biçimselleştirme (C_E, F_info)
 ## C_E
 - Varsayılan: kovaryans benzeri matrisin Frobenius normu; yoksa güvenli fallback.
 ## F_info

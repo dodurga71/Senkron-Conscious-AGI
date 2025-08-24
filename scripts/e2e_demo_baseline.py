@@ -10,7 +10,7 @@ e2e demo (güncel):
 import json
 from pathlib import Path
 
-from layer1_prediction_engine import curate_data, fuse_data
+from layer1_prediction_engine import curate_data, fuse_data, normalize_numeric_fields
 from layer2_eft_core import compute_CE, minimize_Finfo
 from layer3_communication import generate_narrative
 from layer4_test_validation import compute_accuracy, measure_energy_usage
@@ -18,9 +18,11 @@ from layer4_test_validation import compute_accuracy, measure_energy_usage
 
 def main():
     samples = Path("data_pipelines/samples/raw_events_min.json")
-    raw = json.loads(samples.read_text(encoding="utf-8"))
+    raw = json.loads(samples.read_text(encoding="utf-8-sig"))
 
     curated = curate_data(raw)
+    # demo: varsa sayısal alanları normalize et
+    curated, stats = normalize_numeric_fields(curated, fields=["payload_score"])
     fused = fuse_data(curated, astro={"ok": True}, finance={"ok": True})
 
     # Kovaryans örneği (2x2 birim matris -> Frobenius norm = sqrt(2))
