@@ -1,0 +1,10 @@
+# Python / Node / veri artıkları
+__pycache__/
+*.pyc
+.env
+.env.*
+*.ipynb_checkpoints
+.node_modules/
+dist/
+data-pipelines/.cache/
+.mlflow/
