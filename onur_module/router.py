@@ -14,7 +14,9 @@ def get_metrics():
 
 @router.get("/state/ce")
 def get_ce_state():
-    # Basit bir örnek sinyal ile CE boyutunu raporla
     signals = {"ensemble": {"signal": 0.0, "uncertainty": 0.5}}
     ce = CEState.from_signals(signals)
-    return {"dim": ce.meta.get("dim", None)}
+    C = ce.C
+    if hasattr(C, "tolist"):
+        C = C.tolist()
+    return {"C": C, "dim": ce.meta.get("dim")}

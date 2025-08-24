@@ -4,16 +4,11 @@ from datetime import datetime, timezone
 import json, math
 
 from config.settings import get_settings
-from tracking.mlflow_logger import log_metric  # no-op; kalsın
+from tracking.mlflow_logger import log_metric  # no-op
 
 Number = Union[int, float]
 
 class CalibMonitor:
-    """Basit kalibrasyon izleyici.
-    - update(y_true, y_prob) ile anlık metrik toplar
-    - flush(out_dir?) ile günün JSONL dosyasına yazar
-    - snapshot() ile {brier, logloss, n} döndürür
-    """
     def __init__(self) -> None:
         self._brier_sum: float = 0.0
         self._logloss_sum: float = 0.0
@@ -30,7 +25,6 @@ class CalibMonitor:
         return p
 
     def update(self, y_true: Number, y_prob: Number) -> int:
-        """Bir gözlem ekle ve sayaç döndür."""
         y = 1.0 if float(y_true) >= 0.5 else 0.0
         p = self._clip(y_prob)
         self._brier_sum += (p - y) ** 2
@@ -38,13 +32,12 @@ class CalibMonitor:
         self._n += 1
         return self._n
 
-    def _averages(self) -> (Optional[float], Optional[float]):
+    def _averages(self):
         if self._n == 0:
             return None, None
         return self._brier_sum / self._n, self._logloss_sum / self._n
 
     def count_predictions(self) -> int:
-        """Diskte METRICS_DIR altındaki tüm .jsonl satırlarını say."""
         d = self._metrics_dir()
         if not d.exists():
             return 0
@@ -71,7 +64,6 @@ class CalibMonitor:
         with out_path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
-        # no-op log; hatasız geç
         try:
             if brier is not None: log_metric("avg_brier", float(brier))
             if logloss is not None: log_metric("avg_logloss", float(logloss))
@@ -80,9 +72,12 @@ class CalibMonitor:
 
         return str(out_path)
 
+    # TEST'in beklediği isim:
+    def flush_daily(self, out_dir: Optional[Union[str, Path]] = None) -> str:
+        return self.flush(out_dir=out_dir)
+
     def snapshot(self) -> Dict[str, Any]:
         brier, logloss = self._averages()
-        # RAM sayacı ve disk satır sayısı arasından büyüğünü al
         n_disk = self.count_predictions()
         n = max(self._n, n_disk)
         return {"brier": brier, "logloss": logloss, "n": n}
