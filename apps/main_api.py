@@ -8,7 +8,7 @@ from layer2_eft_core.ce_state import CEState
 from layer2_eft_core.eft_objective import f_info
 from layer3_communication.storyteller import build_narrative
 
-app = FastAPI(title="SENKRON API", version="0.2.0")
+app = FastAPI(title="SENKRON API", version="0.3.0")
 
 class FeaturesIn(BaseModel):
     features: Dict[str, Any] = Field(default_factory=dict)
@@ -20,25 +20,23 @@ class InterpretationOut(BaseModel):
 
 @app.get("/healthz")
 def healthz():
-    return {"ok": True, "service": "senkron", "version": "0.2.0"}
+    return {"ok": True, "service": "senkron", "version": "0.3.0"}
 
 @app.post("/forecast/interpret", response_model=InterpretationOut)
 def interpret_forecast(inp: FeaturesIn):
-    # 1) Ensemble tahmin
     ens = EnsemblePredictor()
     fused = ens.predict(inp.features)
 
-    # 2) EFT: CE ve F_info
     signals = {"ensemble": {"signal": fused["signal"], "uncertainty": fused["uncertainty"]}}
     ce = CEState.from_signals(signals)
     score = f_info(signals, ce.C, alpha=0.1)
 
-    # 3) Anlatı üret
     nlg = build_narrative(
         signal=fused["signal"],
         uncertainty=fused["uncertainty"],
         reliability=fused["reliability"],
-        sources=["astro","finance","chaos","quantum","geopolitical"]
+        sources=["astro","finance","chaos","quantum","geopolitical"],
+        source_details=fused.get("sources")
     )
 
     return {
@@ -48,10 +46,11 @@ def interpret_forecast(inp: FeaturesIn):
             "uncertainty": fused["uncertainty"],
             "reliability": fused["reliability"],
             "f_info": round(score, 6),
-            "ce_dim": ce.meta["dim"]
+            "ce_dim": ce.meta["dim"],
+            "sources": fused.get("sources", [])
         },
         "meta": {"schema": "v1", "engine": "senkron"}
     }
 
-# Onur modülü (read-only) aynen bağlı kalır
+# Onur modülü (read-only)
 app.include_router(onur_router)

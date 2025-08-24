@@ -1,20 +1,32 @@
 ﻿from __future__ import annotations
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 def _confidence_label(score: float) -> str:
-    # score ~ [0..1] -> etiket
-    if score >= 0.75:
-        return "yüksek"
-    if score >= 0.45:
-        return "orta"
+    if score >= 0.75: return "yüksek"
+    if score >= 0.45: return "orta"
     return "düşük"
 
-def build_narrative(signal: float, uncertainty: float, reliability: float, sources: List[str] | None = None) -> Dict[str, Any]:
-    """
-    Bilge Rehber tarzında metin üretir ve şeffaflık alanlarını döndürür.
-    """
-    sources = sources or ["astro", "finance", "chaos", "quantum", "geopolitical", "social"]
-    # 0..1 arası genel güven puanı: güvenilirlik * (1 - belirsizlik)
+def _format_drivers(source_details: List[Dict[str, float]], top_k: int = 3) -> str:
+    if not source_details: return ""
+    tops = source_details[:top_k]
+    frags = []
+    for d in tops:
+        name = d.get("name","").replace("_predictor","")
+        c = float(d.get("contribution", 0.0))
+        sign = "+" if c >= 0 else "-"
+        frags.append(f"{name}({sign}{abs(c):.2f})")
+    return ", ".join(frags)
+
+def build_narrative(
+    signal: float,
+    uncertainty: float,
+    reliability: float,
+    sources: Optional[List[str]] | None = None,
+    source_details: Optional[List[Dict[str, float]]] = None
+) -> Dict[str, Any]:
+    """Bilge Rehber tarzı metin + şeffaflık alanları."""
+    sources = sources or ["astro","finance","chaos","quantum","geopolitical","social"]
+
     conf_score = max(0.0, min(1.0, reliability * (1.0 - uncertainty)))
     conf_label = _confidence_label(conf_score)
 
@@ -22,12 +34,16 @@ def build_narrative(signal: float, uncertainty: float, reliability: float, sourc
     kuvvet = abs(signal)
     kuvvet_etiket = "zayıf" if kuvvet < 0.08 else ("ılımlı" if kuvvet < 0.2 else "belirgin")
 
+    drivers_txt = _format_drivers(source_details or [])
+    driver_clause = f" Başlıca sürücüler: {drivers_txt}." if drivers_txt else ""
+
     narrative = (
         "Gözlemlediğimiz örüntüler, geçmiş yankılarla bugünün sinyallerini buluşturuyor. "
         f"Piyasa yönü {yön} ve {kuvvet_etiket} bir ivme gösteriyor. "
         f"Güven düzeyi {conf_label}; çünkü model güvenilirliği {reliability:.2f} ve belirsizlik {uncertainty:.2f}. "
         "Bu bir kehanet değil; olasılık ufkunda bir rota önerisi. "
         "Adımlarını küçük riskle dene, çeşitlendir ve geri bildirim döngülerini kısa tut."
+        + driver_clause
     )
 
     assumptions = [
@@ -41,10 +57,20 @@ def build_narrative(signal: float, uncertainty: float, reliability: float, sourc
         "Likidite/düzenleyici haber akışı şokları."
     ]
 
+    source_summary = []
+    for d in (source_details or []):
+        source_summary.append({
+            "name": d.get("name"),
+            "reliability": round(float(d.get("reliability", 0.0)), 3),
+            "uncertainty": round(float(d.get("uncertainty", 0.0)), 3),
+            "contribution": round(float(d.get("contribution", 0.0)), 3),
+        })
+
     return {
         "narrative": narrative,
         "confidence": {"score": round(conf_score, 3), "label": conf_label},
         "assumptions": assumptions,
         "risks": risks,
-        "energy_cost": None  # ileride CodeCarbon ölçümü eklenebilir
+        "source_summary": source_summary,
+        "energy_cost": None
     }
