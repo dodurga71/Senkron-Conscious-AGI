@@ -1,17 +1,24 @@
 ﻿from __future__ import annotations
 from typing import List, Dict, Any
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from pathlib import Path
 import json
 
 from data_curation.validator import validate_records
 from data_pipelines.etl.transformers import pii_mask, reliability_tagging
 
+def _to_jsonable(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    if isinstance(obj, date):
+        return obj.isoformat()
+    if isinstance(obj, dict):
+        return {k: _to_jsonable(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_to_jsonable(v) for v in obj]
+    return obj
+
 def run_etl(raw_records: List[Dict[str, Any]], out_dir: str = "data-pipelines/output") -> Dict[str, Any]:
-    """
-    raw_records -> PII mask -> reliability -> doğrulama -> JSONL yaz
-    Döndür: {"ok":int, "err":int, "outfile": Path}
-    """
     curated = []
     for rec in raw_records:
         masked = pii_mask(rec, whitelist_keys={"headline"})
@@ -29,12 +36,12 @@ def run_etl(raw_records: List[Dict[str, Any]], out_dir: str = "data-pipelines/ou
     ok = v["valid"]
     err = v["errors"]
 
-    # yaz
     out_path = Path(out_dir)
     out_path.mkdir(parents=True, exist_ok=True)
     outfile = out_path / f"curated_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.jsonl"
     with open(outfile, "w", encoding="utf-8") as f:
         for row in ok:
+            row = _to_jsonable(row)
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     return {"ok": len(ok), "err": len(err), "outfile": str(outfile)}
