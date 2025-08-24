@@ -10,7 +10,6 @@ router = APIRouter(prefix="/onur", tags=["onur"])
 _FORECASTS_RAW: deque = deque(maxlen=1000)
 
 def record_forecast_observation(raw: Dict[str, Any]) -> None:
-    """/forecast/interpret çıktısının 'raw' kısmını hafızada sakla."""
     try:
         _FORECASTS_RAW.append(raw)
     except Exception:
@@ -35,7 +34,18 @@ def get_ce_state():
 
 @router.get("/forecasts/raw")
 def get_forecasts_raw(limit: int = 20):
-    """Son ham tahminler (interpret -> raw)."""
+    """
+    Son ham tahminler (interpret -> raw).
+    Test beklentisi: top-level 'signals' (liste) ve 'f_info' (son değer) alanları bulunsun.
+    """
     items: List[Dict[str, Any]] = list(_FORECASTS_RAW)[-limit:]
     last: Optional[Dict[str, Any]] = items[-1] if items else None
-    return {"count": len(_FORECASTS_RAW), "last": last, "items": items}
+    signals: List[float] = [float(x.get("signal", 0.0)) for x in items]
+    f_info_last: Optional[float] = (float(last.get("f_info")) if (last and "f_info" in last) else None)
+    return {
+        "count": len(_FORECASTS_RAW),
+        "signals": signals,      # <-- testin aradığı alan
+        "f_info": f_info_last,   # <-- testin aradığı alan
+        "last": last,
+        "items": items,
+    }
