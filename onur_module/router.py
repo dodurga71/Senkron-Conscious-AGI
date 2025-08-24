@@ -1,5 +1,6 @@
 ﻿from fastapi import APIRouter
 from layer4_test_validation.calib_monitor import calib_monitor
+from layer2_eft_core.ce_state import CEState
 
 router = APIRouter(prefix="/onur", tags=["onur"])
 
@@ -10,3 +11,10 @@ def ping():
 @router.get("/metrics")
 def get_metrics():
     return {"calibration": calib_monitor.snapshot()}
+
+@router.get("/state/ce")
+def get_ce_state():
+    # Basit bir örnek sinyal ile CE boyutunu raporla
+    signals = {"ensemble": {"signal": 0.0, "uncertainty": 0.5}}
+    ce = CEState.from_signals(signals)
+    return {"dim": ce.meta.get("dim", None)}
