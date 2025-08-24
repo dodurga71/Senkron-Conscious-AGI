@@ -21,3 +21,9 @@ def get_raw_forecasts():
     ce = CEState.from_signals(_SAMPLE)
     score = f_info(_SAMPLE, ce.C, alpha=0.1)
     return {"signals": _SAMPLE, "f_info": round(score, 6)}
+from layer4_test_validation.calib_monitor import calib_monitor
+
+@router.get("/metrics")
+def get_metrics():
+    """Kalibrasyon son özet metrikleri (demo)."""
+    return {"calibration": calib_monitor.snapshot()}
