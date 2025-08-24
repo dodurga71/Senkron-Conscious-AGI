@@ -1,33 +1,47 @@
 ﻿from __future__ import annotations
-from typing import Dict, Any, Optional
-import os
+from typing import Any, Optional
 
-def log_run(run_name: str, params: Dict[str, Any], metrics: Dict[str, float], tags: Optional[Dict[str, Any]] = None) -> bool:
-    """
-    MLflow-skinny mevcut ve MLFLOW_LOG=1 ise loglar.
-    Yoksa sessizce no-op (False döner).
-    """
-    if os.getenv("MLFLOW_LOG", "0") != "1":
-        return False
-    try:
-        import mlflow
-    except Exception:
-        return False
+"""
+MLflow skinny varsa kullan, yoksa no-op olacak hafif bir sarmalayıcı.
+CI ve lokal testlerde import hatası atmadan log çağrılarını karşılar.
+"""
 
-    try:
-        uri = os.getenv("MLFLOW_TRACKING_URI")
-        if uri:
-            mlflow.set_tracking_uri(uri)
-        with mlflow.start_run(run_name=run_name):
-            for k, v in (params or {}).items():
-                mlflow.log_param(k, str(v))
-            for k, v in (metrics or {}).items():
-                try:
-                    mlflow.log_metric(k, float(v))
-                except Exception:
-                    pass
-            if tags:
-                mlflow.set_tags(tags)
-        return True
-    except Exception:
-        return False
+MLFLOW_ENABLED = False
+try:
+    import mlflow  # type: ignore
+    MLFLOW_ENABLED = True
+except Exception:
+    mlflow = None  # type: ignore[misc]
+
+class _NoopRun:
+    def __enter__(self): return self
+    def __exit__(self, exc_type, exc, tb): return False
+
+def start_run(run_name: Optional[str] = None):
+    if MLFLOW_ENABLED:
+        return mlflow.start_run(run_name=run_name)  # type: ignore[attr-defined]
+    return _NoopRun()
+
+def end_run(status: str = "FINISHED"):
+    if MLFLOW_ENABLED:
+        try:
+            mlflow.end_run(status=status)  # type: ignore[attr-defined]
+        except Exception:
+            pass  # sessizce yut
+
+def log_metric(key: str, value: float, step: Optional[int] = None):
+    """CI'nin beklediği imza: tek metrik loglama."""
+    if MLFLOW_ENABLED:
+        try:
+            mlflow.log_metric(key, float(value), step=step)  # type: ignore[attr-defined]
+        except Exception:
+            pass
+
+def log_param(key: str, value: Any):
+    if MLFLOW_ENABLED:
+        try:
+            mlflow.log_param(key, value)  # type: ignore[attr-defined]
+        except Exception:
+            pass
+
+__all__ = ["start_run", "end_run", "log_metric", "log_param"]
