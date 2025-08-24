@@ -1,5 +1,7 @@
-﻿from __future__ import annotations
-from typing import List, Dict, Any
+from __future__ import annotations
+
+from typing import Any, Dict, List
+
 
 def validate_records(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     ok = []

@@ -1,11 +1,20 @@
-﻿from __future__ import annotations
+from __future__ import annotations
+
+import json
+import pathlib
+import time
+import uuid
 from contextlib import contextmanager
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any
-import json, os, time, uuid, pathlib
+from typing import Any, Dict, Optional
+
 
 @contextmanager
-def telemetry_run(component: str, out_dir: str = "logs/telemetry", extra: Optional[Dict[str, Any]] = None):
+def telemetry_run(
+    component: str,
+    out_dir: str = "logs/telemetry",
+    extra: Optional[Dict[str, Any]] = None,
+):
     """
     Komponent bazlı ölçüm. JSONL'e şu alanlar yazılır:
     {ts, run_id, component, duration_sec, emissions_kg, extra}
@@ -18,7 +27,10 @@ def telemetry_run(component: str, out_dir: str = "logs/telemetry", extra: Option
 
     try:
         from codecarbon import EmissionsTracker  # opsiyonel
-        tracker = EmissionsTracker(log_level="error", measure_power_secs=1, offline=True)
+
+        tracker = EmissionsTracker(
+            log_level="error", measure_power_secs=1, offline=True
+        )
         tracker.start()
     except Exception:
         tracker = None
@@ -38,8 +50,10 @@ def telemetry_run(component: str, out_dir: str = "logs/telemetry", extra: Option
             "run_id": run_id,
             "component": component,
             "duration_sec": round(duration, 6),
-            "emissions_kg": float(emissions) if isinstance(emissions, (int, float)) else None,
-            "extra": extra or {}
+            "emissions_kg": (
+                float(emissions) if isinstance(emissions, (int, float)) else None
+            ),
+            "extra": extra or {},
         }
         path = pathlib.Path(out_dir)
         path.mkdir(parents=True, exist_ok=True)

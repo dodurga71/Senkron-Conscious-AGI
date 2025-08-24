@@ -1,5 +1,9 @@
-﻿from layer1_prediction_engine.calibration import brier_score, log_loss, OnlineCalibration
-import math
+from layer1_prediction_engine.calibration import (
+    OnlineCalibration,
+    brier_score,
+    log_loss,
+)
+
 
 def test_brier_and_logloss_values():
     y = [1, 0, 1]
@@ -8,6 +12,7 @@ def test_brier_and_logloss_values():
     assert abs(b - 0.0733333333) < 1e-6
     ll = log_loss(y, p)
     assert 0.2 < ll < 0.7  # makul aralık (doğruluk testi)
+
 
 def test_online_calibration_updates():
     oc = OnlineCalibration()

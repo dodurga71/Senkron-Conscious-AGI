@@ -1,12 +1,14 @@
-﻿from pathlib import Path
-from typing import Dict, Any, Optional, Union
+import json
+import math
 from datetime import datetime, timezone
-import json, math
+from pathlib import Path
+from typing import Any, Dict, Optional, Union
 
 from config.settings import get_settings
 from tracking.mlflow_logger import log_metric  # no-op
 
 Number = Union[int, float]
+
 
 class CalibMonitor:
     def __init__(self) -> None:
@@ -20,8 +22,10 @@ class CalibMonitor:
     @staticmethod
     def _clip(p: Number, eps: float = 1e-12) -> float:
         p = float(p)
-        if p < eps: return eps
-        if p > 1.0 - eps: return 1.0 - eps
+        if p < eps:
+            return eps
+        if p > 1.0 - eps:
+            return 1.0 - eps
         return p
 
     def update(self, y_true: Number, y_prob: Number) -> int:
@@ -65,8 +69,10 @@ class CalibMonitor:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
         try:
-            if brier is not None: log_metric("avg_brier", float(brier))
-            if logloss is not None: log_metric("avg_logloss", float(logloss))
+            if brier is not None:
+                log_metric("avg_brier", float(brier))
+            if logloss is not None:
+                log_metric("avg_logloss", float(logloss))
         except Exception:
             pass
 
@@ -81,5 +87,6 @@ class CalibMonitor:
         n_disk = self.count_predictions()
         n = max(self._n, n_disk)
         return {"brier": brier, "logloss": logloss, "n": n}
+
 
 calib_monitor = CalibMonitor()

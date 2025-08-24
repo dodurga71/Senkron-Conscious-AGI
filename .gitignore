@@ -8,3 +8,7 @@ __pycache__/
 dist/
 data-pipelines/.cache/
 .mlflow/
+logs/
+outputs/
+data-pipelines/output/
+mlruns/

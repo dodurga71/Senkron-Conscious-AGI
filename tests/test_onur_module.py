@@ -1,7 +1,9 @@
-﻿from fastapi.testclient import TestClient
+from fastapi.testclient import TestClient
+
 from apps.main_api import app
 
 client = TestClient(app)
+
 
 def test_onur_endpoints():
     r1 = client.get("/onur/state/ce")

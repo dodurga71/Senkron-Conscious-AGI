@@ -1,5 +1,7 @@
-﻿from fastapi.testclient import TestClient
+from fastapi.testclient import TestClient
+
 from apps.main_api import app
+
 
 def test_onur_metrics_endpoint_accumulates():
     client = TestClient(app)

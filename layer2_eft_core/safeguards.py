@@ -1,5 +1,7 @@
-﻿from __future__ import annotations
+from __future__ import annotations
+
 from typing import Dict
+
 
 def eap_clamp(hyperparams: Dict[str, float]) -> Dict[str, float]:
     """EAP: hiperparametreleri güvenli aralıklara kelepçeler."""

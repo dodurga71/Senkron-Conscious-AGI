@@ -1,15 +1,20 @@
-﻿from typing import Dict, Any, List
+from typing import Any, Dict, List
+
 from .astro_predictor import AstroPredictor
-from .financial_predictor import FinancialPredictor
 from .chaos_predictor import ChaosPredictor
-from .quantum_predictor import QuantumPredictor
+from .financial_predictor import FinancialPredictor
 from .geopolitical_predictor import GeopoliticalPredictor
+from .quantum_predictor import QuantumPredictor
+
 
 class EnsemblePredictor:
     def __init__(self):
         self.mods = [
-            AstroPredictor(), FinancialPredictor(),
-            ChaosPredictor(), QuantumPredictor(), GeopoliticalPredictor()
+            AstroPredictor(),
+            FinancialPredictor(),
+            ChaosPredictor(),
+            QuantumPredictor(),
+            GeopoliticalPredictor(),
         ]
 
     def predict(self, features: Dict[str, Any]) -> Dict[str, Any]:
@@ -23,21 +28,23 @@ class EnsemblePredictor:
             sigs.append(r["signal"])
             weights.append(r["reliability"])
             unc.append(r["uncertainty"])
-            details.append({
-                "name": m.name,
-                "signal": r["signal"],
-                "uncertainty": r["uncertainty"],
-                "reliability": r["reliability"],
-            })
+            details.append(
+                {
+                    "name": m.name,
+                    "signal": r["signal"],
+                    "uncertainty": r["uncertainty"],
+                    "reliability": r["reliability"],
+                }
+            )
 
         total_w = sum(weights) or 1.0
-        signal = sum(w*s for w, s in zip(weights, sigs)) / total_w
+        signal = sum(w * s for w, s in zip(weights, sigs, strict=False)) / total_w
         uncertainty = sum(unc) / len(unc)
         reliability = min(1.0, sum(weights) / len(weights))
 
         # katkı (ağırlıklı sinyal payı)
-        contribs = [(w*s)/total_w for w, s in zip(weights, sigs)]
-        for d, c in zip(details, contribs):
+        contribs = [(w * s) / total_w for w, s in zip(weights, sigs, strict=False)]
+        for d, c in zip(details, contribs, strict=False):
             d["contribution"] = c
 
         # sürücüler (mutlak katkıya göre sıralı)
@@ -47,5 +54,5 @@ class EnsemblePredictor:
             "signal": signal,
             "uncertainty": uncertainty,
             "reliability": reliability,
-            "sources": details  # nlg için zengin içerik
+            "sources": details,  # nlg için zengin içerik
         }
