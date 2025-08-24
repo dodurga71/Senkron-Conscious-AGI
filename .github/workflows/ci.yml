@@ -1,4 +1,4 @@
-name: CI
+﻿name: CI
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
           pip install -r requirements.txt
           pip install pytest-cov
       - name: Pytest (with coverage)
-        run: pytest --cov=. --cov-report=term --cov-report=xml --cov-fail-under=80 -q
+        run: pytest --cov=. --cov-report=term --cov-report=xml --cov-fail-under=85 -q
       - name: Store coverage
         uses: actions/upload-artifact@v4
         with:
