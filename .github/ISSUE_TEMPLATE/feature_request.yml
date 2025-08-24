@@ -1,0 +1,15 @@
+﻿name: Feature request
+description: Yeni özellik isteği
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: value
+    attributes:
+      label: Değer önerisi
+      description: Neden gerekli?
+      placeholder: Kullanım senaryosu
+      render: markdown
+      value: >
+        **Problem:** …
+        **Öneri:** …
+        **Kabul Kriteri:** …

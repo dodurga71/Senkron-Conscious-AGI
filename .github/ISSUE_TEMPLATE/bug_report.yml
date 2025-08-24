@@ -1,0 +1,21 @@
+﻿name: Bug report
+description: Hata bildirimi
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Ne oldu?
+      description: Beklenen ve gerçekleşen davranış
+      placeholder: Açıklama
+    validations:
+      required: true
+  - type: input
+    id: repro
+    attributes:
+      label: Tekrarlama adımları
+      placeholder: Adım 1, 2, 3...
+  - type: textarea
+    id: logs
+    attributes:
+      label: Loglar / ekran görüntüsü
