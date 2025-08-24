@@ -1,32 +1,37 @@
-﻿from __future__ import annotations
-from typing import Dict, Any
-from pathlib import Path
-from datetime import datetime, timezone
-import json
+﻿from pathlib import Path
+from typing import Dict, Any, Optional
 
-from layer1_prediction_engine.calibration import OnlineCalibration
-from tracking.mlflow_logger import log_metric
+from config.settings import get_settings
+from tracking.mlflow_logger import log_metric  # no-op; kalsın
 
 class CalibMonitor:
+    """Basit kalibrasyon izleyici. n = METRICS_DIR altındaki jsonl satır sayısı."""
     def __init__(self) -> None:
-        self.oc = OnlineCalibration()
+        self._brier: Optional[float] = None
+        self._logloss: Optional[float] = None
 
-    def update(self, y_true: int, p_hat: float) -> None:
-        self.oc.update_binary(int(y_true), float(p_hat))
+    def _metrics_dir(self) -> Path:
+        return Path(get_settings().METRICS_DIR)
+
+    def count_predictions(self) -> int:
+        d = self._metrics_dir()
+        if not d.exists():
+            return 0
+        n = 0
+        for p in d.glob("*.jsonl"):
+            try:
+                with p.open("r", encoding="utf-8") as f:
+                    for _ in f:
+                        n += 1
+            except FileNotFoundError:
+                pass
+        return n
 
     def snapshot(self) -> Dict[str, Any]:
-        return self.oc.metrics
-
-    def flush_daily(self, out_dir: str = "logs/metrics") -> str:
-        m = self.snapshot()
-        Path(out_dir).mkdir(parents=True, exist_ok=True)
-        path = Path(out_dir) / (datetime.now(timezone.utc).strftime("%Y-%m-%d") + ".jsonl")
-        rec = {"ts": datetime.now(timezone.utc).isoformat(), **m}
-        with path.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-        if m.get("brier") is not None:
-            log_metric("brier", float(m["brier"]))
-            log_metric("logloss", float(m["logloss"]))
-        return str(path)
+        return {
+            "brier": self._brier,
+            "logloss": self._logloss,
+            "n": self.count_predictions(),
+        }
 
 calib_monitor = CalibMonitor()
