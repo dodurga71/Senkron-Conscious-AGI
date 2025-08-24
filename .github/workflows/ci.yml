@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
           pip install -r requirements.txt
           pip install pytest-cov
       - name: Pytest (with coverage)
-        run: pytest --cov=. --cov-report=term --cov-report=xml -q
+        run: pytest --cov=. --cov-report=term --cov-report=xml --cov-fail-under=80 -q
       - name: Store coverage
         uses: actions/upload-artifact@v4
         with:
@@ -52,6 +52,16 @@ jobs:
         run: python -m scripts.e2e_demo
       - name: Run e2e demo (baseline, JSON outputs)
         run: python -m scripts.e2e_demo_baseline
+      - name: Validate baseline artifacts
+        run: |
+          test -f outputs/e2e_baseline.json
+          python - <<'PY'
+import json
+with open('outputs/e2e_baseline.json', encoding='utf-8') as f:
+    d = json.load(f)
+assert 'C_E' in d and 'F_info' in d and 'energy' in d
+print('Baseline JSON looks OK.')
+PY
       - name: Upload e2e artifacts
         uses: actions/upload-artifact@v4
         with:
