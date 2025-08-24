@@ -1,75 +1,58 @@
 ﻿from __future__ import annotations
 from pathlib import Path
-from typing import List, Tuple, Dict, Any
-import json, csv
+import json
+from typing import List, Tuple
+
+TITLE = "Kalibrasyon Raporu"
 
 def _read_jsonl(p: Path) -> List[dict]:
     if not p.exists():
         return []
-    out: List[dict] = []
-    for line in p.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line:
+    out = []
+    for ln in p.read_text(encoding="utf-8").splitlines():
+        ln = ln.strip()
+        if not ln:
             continue
         try:
-            out.append(json.loads(line))
-        except Exception:
-            # bozuk satırı atla
-            pass
+            out.append(json.loads(ln))
+        except json.JSONDecodeError:
+            continue
     return out
 
-def _aggregate(rows: List[dict]) -> Dict[str, Any]:
-    briers = [r.get("brier") for r in rows if isinstance(r.get("brier"), (int, float))]
-    logs   = [r.get("logloss") for r in rows if isinstance(r.get("logloss"), (int, float))]
-    return {
-        "avg_brier": (sum(briers) / len(briers)) if briers else None,
-        "avg_logloss": (sum(logs) / len(logs))   if logs   else None,
-        "n_rows": len(rows),
-    }
-
 def generate_dashboard(metrics_dir: str, out_csv: str, out_md: str) -> Tuple[str, str]:
-    """
-    metrics_dir altındaki *.jsonl dosyalarını okuyup
-    günlük özetleri CSV ve Markdown olarak üretir.
-    Dönüş: (csv_path, md_path)
-    """
     mdir = Path(metrics_dir)
-    mdir.mkdir(parents=True, exist_ok=True)
-    files = sorted(mdir.glob("*.jsonl"))
+    rows = []
+    for fp in sorted(mdir.glob("*.jsonl")):
+        day = fp.stem  # YYYY-MM-DD
+        recs = _read_jsonl(fp)
+        if not recs:
+            continue
+        last = recs[-1]  # günün en güncel kaydı
+        brier = float(last.get("brier", 0))
+        logloss = float(last.get("logloss", 0))
+        n = int(last.get("n", len(recs)))
+        rows.append({"date": day, "avg_brier": brier, "avg_logloss": logloss, "n_rows": n})
 
-    history: List[Tuple[str, Any, Any, int]] = []
-    for f in files:
-        day = f.stem  # YYYY-MM-DD
-        agg = _aggregate(_read_jsonl(f))
-        history.append((day, agg["avg_brier"], agg["avg_logloss"], agg["n_rows"]))
+    # CSV yaz
+    csvp = Path(out_csv); csvp.parent.mkdir(parents=True, exist_ok=True)
+    with csvp.open("w", encoding="utf-8", newline="") as f:
+        f.write("date,avg_brier,avg_logloss,n_rows\n")
+        for r in rows:
+            f.write(f'{r["date"]},{r["avg_brier"]},{r["avg_logloss"]},{r["n_rows"]}\n')
 
-    # CSV
-    csv_path = Path(out_csv)
-    csv_path.parent.mkdir(parents=True, exist_ok=True)
-    with csv_path.open("w", newline="", encoding="utf-8") as w:
-        writer = csv.writer(w)
-        writer.writerow(["date", "avg_brier", "avg_logloss", "n_rows"])
-        for day, b, l, n in history:
-            writer.writerow([day,
-                             (None if b is None else round(b, 6)),
-                             (None if l is None else round(l, 6)),
-                             n])
-
-    # Markdown
-    md_path = Path(out_md)
-    md_path.parent.mkdir(parents=True, exist_ok=True)
-    lines = ["# Kalibrasyon Raporu", "", f"Gün sayısı: {len(history)}"]
-    if history:
-        day, b, l, n = history[-1]
-        lines += [
+    # MD yaz (başlık TR)
+    mdp = Path(out_md); mdp.parent.mkdir(parents=True, exist_ok=True)
+    total_days = len(rows)
+    md = [f"# {TITLE}", "", f"Gün sayısı: {total_days}"]
+    if rows:
+        last_row = rows[-1]
+        md += [
             "",
-            f"**Son Gün ({day})**",
-            f"- avg_brier: {None if b is None else round(b, 6)}",
-            f"- avg_logloss: {None if l is None else round(l, 6)}",
-            f"- n_rows: {n}",
+            f'**Son Gün ({last_row["date"]})**',
+            f'- avg_brier: {last_row["avg_brier"]}',
+            f'- avg_logloss: {last_row["avg_logloss"]}',
+            f'- n_rows: {last_row["n_rows"]}',
         ]
-    md_path.write_text("\n".join(lines), encoding="utf-8")
+    mdp.write_text("\n".join(md), encoding="utf-8")
 
-    return (str(csv_path), str(md_path))
-
-
+    return str(csvp), str(mdp)
