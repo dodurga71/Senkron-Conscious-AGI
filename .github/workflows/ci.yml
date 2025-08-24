@@ -48,8 +48,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run e2e demo
+      - name: Run e2e demo (legacy)
         run: python -m scripts.e2e_demo
+      - name: Run e2e demo (baseline, JSON outputs)
+        run: python -m scripts.e2e_demo_baseline
       - name: Upload e2e artifacts
         uses: actions/upload-artifact@v4
         with:

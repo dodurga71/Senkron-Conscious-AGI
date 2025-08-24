@@ -1,10 +1,10 @@
 ﻿"""
-Basit e2e demo (iskele):
+Basit e2e demo (güncel):
 - Ham örnek veriyi oku
 - Küratörlük + füzyon
-- EFT C_E ve F_info (placeholder)
+- EFT C_E ve F_info
 - Narrative üret
-- Metrik/enerji ölç ve yazdır
+- Metrik/enerji ölç ve JSON çıktı olarak kaydet
 """
 
 import json
@@ -23,6 +23,7 @@ def main():
     curated = curate_data(raw)
     fused = fuse_data(curated, astro={"ok": True}, finance={"ok": True})
 
+    # C_E: örnek kovaryans yoksa fallback kullanır
     ce = compute_CE({"example": 1, "fused_count": fused["count"]})
     finfo = minimize_Finfo(expect_KR=ce, alpha=0.1, S_EE=1.0)
 
@@ -30,13 +31,22 @@ def main():
     acc = compute_accuracy([1, 0, 1], [1, 1, 1])
     energy = measure_energy_usage()
 
-    print("CURATED:", len(curated))
-    print("FUSED :", fused)
-    print("C_E   :", ce)
-    print("F_info:", finfo)
-    print("NLG   :", narrative)
-    print("ACC   :", acc)
-    print("ENERGY:", energy)
+    out = {
+        "curated_count": len(curated),
+        "fused": fused,
+        "C_E": ce,
+        "F_info": finfo["F_info"],
+        "narrative": narrative,
+        "accuracy": acc,
+        "energy": energy,
+    }
+
+    Path("outputs").mkdir(parents=True, exist_ok=True)
+    Path("logs").mkdir(parents=True, exist_ok=True)
+    Path("outputs/e2e_baseline.json").write_text(
+        json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    print("[e2e-baseline] outputs/e2e_baseline.json yazıldı.")
 
 
 if __name__ == "__main__":
