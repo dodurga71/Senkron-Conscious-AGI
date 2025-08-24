@@ -8,7 +8,9 @@ on:
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,13 +19,24 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
+
+      - name: Upgrade pip tooling
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
 
       - name: Install deps
         run: |
-          python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Show env (debug)
+        run: |
+          python - << 'PY'
+          import sys,os
+          print("CWD:", os.getcwd())
+          print("PYTHONPATH:", os.environ.get("PYTHONPATH"))
+          print("sys.path[0:3]:", sys.path[:3])
+          PY
 
       - name: Run pytest
         run: pytest -q
-        env:
-          PYTHONPATH: .
