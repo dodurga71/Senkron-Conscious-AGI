@@ -7,7 +7,7 @@ import json
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-from onur_module.router import router as onur_router
+from onur_module.router import router as onur_router, record_forecast_observation, record_forecast_observation
 from layer1_prediction_engine.ensemble import EnsemblePredictor
 from layer2_eft_core.ce_state import CEState
 from layer2_eft_core.eft_objective import f_info
@@ -80,3 +80,5 @@ def interpret_forecast(inp: FeaturesIn):
 
 # Onur modülü (read-only)
 app.include_router(onur_router)
+
+
