@@ -56,17 +56,9 @@ jobs:
         run: |
           test -f outputs/e2e_baseline.json
           python - <<'PY'
-import json
-with open('outputs/e2e_baseline.json', encoding='utf-8') as f:
-    d = json.load(f)
-assert 'C_E' in d and 'F_info' in d and 'energy' in d
-print('Baseline JSON looks OK.')
-PY
-      - name: Upload e2e artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-report
-          path: |
-            outputs/**
-            logs/**
-          if-no-files-found: ignore
+          import json
+          with open('outputs/e2e_baseline.json', encoding='utf-8') as f:
+              d = json.load(f)
+          assert 'C_E' in d and 'F_info' in d and 'energy' in d
+          print('Baseline JSON looks OK.')
+          PY
