@@ -1,0 +1,5 @@
+﻿[
+  {"id": "e1", "ts": "2025-08-24T10:00:00Z", "payload": {"topic": "astro"}},
+  {"id": "e2", "ts": "2025-08-24T10:05:00Z", "payload": {"topic": "finance"}},
+  {"id": "bad", "payload": {}}
+]
