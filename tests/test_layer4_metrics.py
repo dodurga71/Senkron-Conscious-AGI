@@ -1,4 +1,4 @@
-﻿from layer4_test_validation import compute_accuracy, measure_energy_usage
+from layer4_test_validation import compute_accuracy, measure_energy_usage
 
 
 def test_metrics_and_energy():

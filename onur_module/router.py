@@ -6,6 +6,14 @@ from fastapi import APIRouter
 from layer2_eft_core.ce_state import CEState
 from layer4_test_validation.calib_monitor import calib_monitor
 
+
+def _to_float(value: Any) -> float:
+    try:
+        return float(value) if value is not None else 0.0
+    except (TypeError, ValueError):
+        return 0.0
+
+
 router = APIRouter(prefix="/onur", tags=["onur"])
 
 # In-memory ring buffer (son 1000 kayıt)
@@ -47,8 +55,8 @@ def get_forecasts_raw(limit: int = 20):
     """
     items: list[dict[str, Any]] = list(_FORECASTS_RAW)[-limit:]
     last: dict[str, Any] | None = items[-1] if items else None
-    signals: list[float] = [float(x.get("signal", 0.0)) for x in items]
-    f_info_last: float | None = float(last.get("f_info")) if (last and "f_info" in last) else None
+    signals: list[float] = [_to_float(x.get("signal", 0.0)) for x in items]
+    f_info_last: float | None = _to_float(last.get("f_info")) if (last and "f_info" in last) else None
     return {
         "count": len(_FORECASTS_RAW),
         "signals": signals,  # <-- testin aradığı alan

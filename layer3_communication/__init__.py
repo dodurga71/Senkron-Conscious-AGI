@@ -1,4 +1,4 @@
-﻿"""Layer 3 public API."""
+"""Layer 3 public API."""
 
 from .narrative_pipeline import generate_narrative as generate_narrative
 

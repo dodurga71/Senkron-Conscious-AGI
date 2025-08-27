@@ -1,4 +1,4 @@
-﻿from data_pipelines.dask_pipeline import load_json_array
+from data_pipelines.dask_pipeline import load_json_array
 
 
 def test_dask_load_json_array():

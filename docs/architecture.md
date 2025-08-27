@@ -87,4 +87,3 @@ flowchart TB
   L4A-->L1B
   L4B-->L2B
   L3A-->|çıktılar|EndUser[(Uygulamalar)]
-

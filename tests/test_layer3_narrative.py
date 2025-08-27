@@ -1,4 +1,4 @@
-﻿from layer3_communication import generate_narrative
+from layer3_communication import generate_narrative
 
 
 def test_narrative():

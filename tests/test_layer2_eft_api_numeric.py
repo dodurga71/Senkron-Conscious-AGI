@@ -1,4 +1,4 @@
-﻿from math import isclose, sqrt
+from math import isclose, sqrt
 
 from layer2_eft_core import compute_CE
 

@@ -1,4 +1,4 @@
-﻿from layer2_eft_core import compute_CE, minimize_Finfo
+from layer2_eft_core import compute_CE, minimize_Finfo
 
 
 def test_eft_api():

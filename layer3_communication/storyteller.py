@@ -11,13 +11,13 @@ def _confidence_label(score: float) -> str:
     return "düşük"
 
 
-def _format_drivers(source_details: list[dict[str, float]], top_k: int = 3) -> str:
+def _format_drivers(source_details: list[dict[str, Any]], top_k: int = 3) -> str:
     if not source_details:
         return ""
     tops = source_details[:top_k]
     frags = []
     for d in tops:
-        name = d.get("name", "").replace("_predictor", "")
+        name = str(d.get("name", "")).replace("_predictor", "")
         c = float(d.get("contribution", 0.0))
         sign = "+" if c >= 0 else "-"
         frags.append(f"{name}({sign}{abs(c):.2f})")
@@ -29,7 +29,7 @@ def build_narrative(
     uncertainty: float,
     reliability: float,
     sources: list[str] | None | None = None,
-    source_details: list[dict[str, float]] | None = None,
+    source_details: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Bilge Rehber tarzı metin + şeffaflık alanları."""
     sources = sources or [

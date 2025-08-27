@@ -1,4 +1,4 @@
-﻿"""
+"""
 Katman 3 - Narrative Pipeline (İskelet)
 - Transformers/LangChain eklenecek.
 - Şimdilik: güvenli/denetlenebilir basit şablon üretimi.

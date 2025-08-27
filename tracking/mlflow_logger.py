@@ -2,6 +2,13 @@ from __future__ import annotations
 
 from typing import Any
 
+mlflow: Any = None
+try:
+    import mlflow as _mlflow  # type: ignore[import-not-found]
+
+    mlflow = _mlflow
+except Exception:
+    mlflow = None
 """
 MLflow skinny varsa kullan, yoksa no-op olacak hafif bir sarmalayıcı.
 CI ve lokal testlerde import hatası atmadan log çağrılarını karşılar.
@@ -9,11 +16,9 @@ CI ve lokal testlerde import hatası atmadan log çağrılarını karşılar.
 
 MLFLOW_ENABLED = False
 try:
-    import mlflow  # type: ignore
-
     MLFLOW_ENABLED = True
 except Exception:
-    mlflow = None  # type: ignore[misc]
+    mlflow = None
 
 
 class _NoopRun:
@@ -26,14 +31,14 @@ class _NoopRun:
 
 def start_run(run_name: str | None = None):
     if MLFLOW_ENABLED:
-        return mlflow.start_run(run_name=run_name)  # type: ignore[attr-defined]
+        return mlflow.start_run(run_name=run_name)
     return _NoopRun()
 
 
 def end_run(status: str = "FINISHED"):
     if MLFLOW_ENABLED:
         try:
-            mlflow.end_run(status=status)  # type: ignore[attr-defined]
+            mlflow.end_run(status=status)
         except Exception:
             pass  # sessizce yut
 
@@ -42,7 +47,7 @@ def log_metric(key: str, value: float, step: int | None = None):
     """CI'nin beklediği imza: tek metrik loglama."""
     if MLFLOW_ENABLED:
         try:
-            mlflow.log_metric(key, float(value), step=step)  # type: ignore[attr-defined]
+            mlflow.log_metric(key, float(value), step=step)
         except Exception:
             pass
 
@@ -50,7 +55,7 @@ def log_metric(key: str, value: float, step: int | None = None):
 def log_param(key: str, value: Any):
     if MLFLOW_ENABLED:
         try:
-            mlflow.log_param(key, value)  # type: ignore[attr-defined]
+            mlflow.log_param(key, value)
         except Exception:
             pass
 

@@ -1,4 +1,4 @@
-﻿"""
+"""
 Katman 4 - Metrik & Enerji Ölçüm Planı
 - compute_accuracy: basit örnek
 - measure_energy_usage:

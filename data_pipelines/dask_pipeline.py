@@ -1,4 +1,4 @@
-﻿"""
+"""
 Dask tabanlı veri boru hattı (iskelet).
 - JSON array dosyasını okur (samples/raw_events_min.json gibi)
 - Basit filtre/temizleme uygular

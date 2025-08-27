@@ -41,7 +41,7 @@ def generate_dashboard(metrics_dir: str, out_csv: str, out_md: str) -> tuple[str
     with csvp.open("w", encoding="utf-8", newline="") as f:
         f.write("date,avg_brier,avg_logloss,n_rows\n")
         for r in rows:
-            f.write(f'{r["date"]},{r["avg_brier"]},{r["avg_logloss"]},{r["n_rows"]}\n')
+            f.write(f"{r['date']},{r['avg_brier']},{r['avg_logloss']},{r['n_rows']}\n")
 
     # MD yaz (başlık TR)
     mdp = Path(out_md)
@@ -52,10 +52,10 @@ def generate_dashboard(metrics_dir: str, out_csv: str, out_md: str) -> tuple[str
         last_row = rows[-1]
         md += [
             "",
-            f'**Son Gün ({last_row["date"]})**',
-            f'- avg_brier: {last_row["avg_brier"]}',
-            f'- avg_logloss: {last_row["avg_logloss"]}',
-            f'- n_rows: {last_row["n_rows"]}',
+            f"**Son Gün ({last_row['date']})**",
+            f"- avg_brier: {last_row['avg_brier']}",
+            f"- avg_logloss: {last_row['avg_logloss']}",
+            f"- n_rows: {last_row['n_rows']}",
         ]
     mdp.write_text("\n".join(md), encoding="utf-8")
 

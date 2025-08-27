@@ -1,4 +1,4 @@
-﻿"""
+"""
 Katman 1 - Veri Küratörlüğü ve Füzyon Arayüzü
 - Etik/güvenilirlik kontrolleri (placeholder)
 - Basit normalizasyon (placeholder)

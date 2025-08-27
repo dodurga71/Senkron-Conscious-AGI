@@ -1,4 +1,5 @@
 import math
+from typing import cast
 
 
 def _sharpe(returns, eps=1e-12):
@@ -43,9 +44,9 @@ def run_backtest(prices, signal_series, use_backtrader: bool = False) -> dict[st
     try:
         if use_backtrader:
             # Hafif tutmak için pandas sürümünü kullanıyoruz (CI hızlı kalsın)
-            return backtest_with_pandas(prices, signal_series)
+            return cast(dict[str, float], backtest_with_pandas(prices, signal_series))
         else:
-            return backtest_with_pandas(prices, signal_series)
+            return cast(dict[str, float], backtest_with_pandas(prices, signal_series))
     finally:
         if tracker:
             try:

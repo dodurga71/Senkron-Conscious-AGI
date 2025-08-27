@@ -1,4 +1,4 @@
-﻿from layer1_prediction_engine import curate_data, fuse_data
+from layer1_prediction_engine import curate_data, fuse_data
 
 
 def test_curate_and_fuse():

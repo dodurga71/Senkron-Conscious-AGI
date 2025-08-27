@@ -1,4 +1,4 @@
-﻿"""
+"""
 e2e demo (güncel):
 - Ham örnek veriyi oku
 - Küratörlük + füzyon
