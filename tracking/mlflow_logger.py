@@ -13,11 +13,12 @@ except Exception:
 MLflow skinny varsa kullan, yoksa no-op olacak hafif bir sarmalayıcı.
 CI ve lokal testlerde import hatası atmadan log çağrılarını karşılar.
 """
-
-MLFLOW_ENABLED = False
 try:
-    MLFLOW_ENABLED = True
+    import mlflow as _mlflow  # type: ignore[import-not-found]
+
+    mlflow = _mlflow
 except Exception:
+    mlflow = None
     mlflow = None
 
 
@@ -61,3 +62,4 @@ def log_param(key: str, value: Any):
 
 
 __all__ = ["start_run", "end_run", "log_metric", "log_param"]
+MLFLOW_ENABLED: bool = mlflow is not None
